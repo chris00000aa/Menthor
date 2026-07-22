@@ -169,4 +169,38 @@
   .m-link:hover {
     text-decoration: underline;
   }
+
+  /* Opciones de juego en vivo — 4 colores fijos, compartidos entre
+     la proyección y la pantalla del alumno para lectura instantánea */
+  .m-opt-a { --opt: var(--color-opt-1); }
+  .m-opt-b { --opt: var(--color-opt-2); }
+  .m-opt-c { --opt: var(--color-opt-3); }
+  .m-opt-d { --opt: var(--color-opt-4); }
+
+  .m-opt-a, .m-opt-b, .m-opt-c, .m-opt-d {
+    background-color: color-mix(in srgb, var(--opt) 14%, var(--color-surface));
+    border: 1px solid color-mix(in srgb, var(--opt) 40%, transparent);
+    border-radius: 1rem;
+    transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .m-opt-badge {
+    background-color: var(--opt);
+    color: var(--color-canvas);
+  }
+
+  button.m-opt-a:hover:not(:disabled),
+  button.m-opt-b:hover:not(:disabled),
+  button.m-opt-c:hover:not(:disabled),
+  button.m-opt-d:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--opt) 24%, var(--color-surface));
+    border-color: var(--opt);
+  }
+
+  button.m-opt-a:active:not(:disabled),
+  button.m-opt-b:active:not(:disabled),
+  button.m-opt-c:active:not(:disabled),
+  button.m-opt-d:active:not(:disabled) {
+    transform: scale(0.98);
+  }
 }
