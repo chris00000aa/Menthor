@@ -1,26 +1,172 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   Menthor — sistema de diseño
+   Paleta única: lienzo índigo profundo + turquesa (marca)
+   + dorado cálido (acento) + violeta / rosa (variedad y opciones)
+   ============================================================ */
+
+@theme {
+  /* Tipografía */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-space), var(--font-inter), ui-sans-serif, sans-serif;
+
+  /* Superficies */
+  --color-canvas: #0a0c18;
+  --color-surface: #12162b;
+  --color-elevated: #1a2040;
+  --color-line: #272e52;
+
+  /* Texto */
+  --color-ink: #eef1fb;
+  --color-muted: #99a1c9;
+  --color-faint: #626a94;
+
+  /* Marca y acentos */
+  --color-brand: #26d5b8;
+  --color-brand-strong: #12b39a;
+  --color-accent: #f4b740;
+  --color-violet: #8b7bff;
+  --color-rose: #fb6f92;
+
+  /* Semánticos */
+  --color-success: #34d399;
+  --color-danger: #fb6f92;
+
+  /* Colores de opciones de juego (estilo tablero, coherentes con la marca) */
+  --color-opt-1: #26d5b8;
+  --color-opt-2: #f4b740;
+  --color-opt-3: #8b7bff;
+  --color-opt-4: #fb6f92;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    color-scheme: dark;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-canvas);
+    background-image:
+      radial-gradient(45rem 45rem at 12% -12%, rgba(38, 213, 184, 0.1), transparent 60%),
+      radial-gradient(42rem 42rem at 100% 0%, rgba(139, 123, 255, 0.09), transparent 55%);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: rgba(38, 213, 184, 0.3);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Tarjeta / panel */
+  .m-card {
+    background-color: color-mix(in srgb, var(--color-surface) 88%, transparent);
+    border: 1px solid var(--color-line);
+    border-radius: 1.1rem;
+    box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(6px);
+  }
+
+  /* Etiqueta de campo */
+  .m-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 0.45rem;
+  }
+
+  /* Controles de formulario */
+  .m-input {
+    width: 100%;
+    border-radius: 0.7rem;
+    border: 1px solid var(--color-line);
+    background-color: var(--color-elevated);
+    color: var(--color-ink);
+    padding: 0.68rem 0.9rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  }
+
+  .m-input::placeholder {
+    color: var(--color-faint);
+  }
+
+  .m-input:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px rgba(38, 213, 184, 0.18);
+  }
+
+  /* Botones */
+  .m-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.7rem;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0.72rem 1.15rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform 0.12s ease, box-shadow 0.15s ease, background-color 0.15s ease,
+      border-color 0.15s ease, opacity 0.15s ease;
+  }
+
+  .m-btn:active {
+    transform: translateY(1px);
+  }
+
+  .m-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .m-btn-primary {
+    background-image: linear-gradient(135deg, var(--color-brand), var(--color-brand-strong));
+    color: #04201b;
+    box-shadow: 0 10px 26px -12px rgba(38, 213, 184, 0.65);
+  }
+
+  .m-btn-primary:hover:not(:disabled) {
+    box-shadow: 0 14px 30px -10px rgba(38, 213, 184, 0.8);
+  }
+
+  .m-btn-ghost {
+    background-color: var(--color-elevated);
+    border-color: var(--color-line);
+    color: var(--color-ink);
+  }
+
+  .m-btn-ghost:hover:not(:disabled) {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  /* Enlace de texto */
+  .m-link {
+    color: var(--color-brand);
+    font-weight: 600;
+    text-underline-offset: 3px;
+  }
+
+  .m-link:hover {
+    text-decoration: underline;
+  }
 }

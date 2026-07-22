@@ -1,0 +1,106 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// El profesor: dueño de sus preguntas y sets. Único que tiene cuenta.
+model Docente {
+  id           Int      @id @default(autoincrement())
+  nombre       String
+  correo       String   @unique
+  passwordHash String
+  creadoEn     DateTime @default(now())
+
+  preguntas Pregunta[]
+  sets      Set[]
+}
+
+// Cada pregunta del banco. "opciones" es un JSON guardado como texto.
+model Pregunta {
+  id                Int      @id @default(autoincrement())
+  materia           String
+  tema              String
+  tipo              String   // "opcion_multiple" | "verdadero_falso" | "numerica"
+  enunciado         String
+  opciones          String   // JSON: ["Londres","París","Roma","Berlín"]
+  respuestaCorrecta String   // índice o valor correcto, según el tipo
+  origen            String   @default("manual") // "manual" | "ia"
+  dificultad        String   @default("media")  // "facil" | "media" | "dificil"
+  creadaEn          DateTime @default(now())
+
+  docenteId Int
+  docente   Docente @relation(fields: [docenteId], references: [id], onDelete: Cascade)
+
+  sets       SetPregunta[]
+  respuestas Respuesta[]
+}
+
+// Un conjunto de preguntas reutilizable para lanzar una sala.
+model Set {
+  id       Int      @id @default(autoincrement())
+  nombre   String
+  creadoEn DateTime @default(now())
+
+  docenteId Int
+  docente   Docente @relation(fields: [docenteId], references: [id], onDelete: Cascade)
+
+  preguntas SetPregunta[]
+  salas     Sala[]
+}
+
+// Tabla puente: una pregunta puede estar en varios sets (relación N:N).
+model SetPregunta {
+  setId      Int
+  preguntaId Int
+  orden      Int @default(0)
+
+  set      Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
+  pregunta Pregunta @relation(fields: [preguntaId], references: [id], onDelete: Cascade)
+
+  @@id([setId, preguntaId])
+}
+
+// Una partida en vivo, identificada por su código único.
+model Sala {
+  id       Int      @id @default(autoincrement())
+  codigo   String   @unique
+  estado   String   @default("espera") // "espera" | "jugando" | "finalizada"
+  creadaEn DateTime @default(now())
+
+  setId Int
+  set   Set @relation(fields: [setId], references: [id])
+
+  participantes Participante[]
+}
+
+// Un alumno dentro de una sala (sin cuenta, solo alias).
+model Participante {
+  id      Int    @id @default(autoincrement())
+  alias   String
+  puntaje Int    @default(0)
+
+  salaId Int
+  sala   Sala @relation(fields: [salaId], references: [id], onDelete: Cascade)
+
+  respuestas Respuesta[]
+}
+
+// El registro de cada respuesta, para calcular puntaje y guardar resultados.
+model Respuesta {
+  id            Int     @id @default(autoincrement())
+  respuestaDada String
+  correcta      Boolean
+  tiempoMs      Int
+
+  participanteId Int
+  participante   Participante @relation(fields: [participanteId], references: [id], onDelete: Cascade)
+
+  preguntaId Int
+  pregunta   Pregunta @relation(fields: [preguntaId], references: [id])
+}
