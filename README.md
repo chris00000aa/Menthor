@@ -16,7 +16,6 @@ El docente crea preguntas (a mano o con ayuda de IA), las agrupa en sets, lanza 
 - [Rutas de API](#rutas-de-api)
 - [Eventos de Socket.IO](#eventos-de-socketio)
 - [Limitaciones conocidas](#limitaciones-conocidas)
-- [Documentación](#documentación)
 
 ## Características
 
@@ -149,10 +148,3 @@ El avance de pregunta también puede dispararse automáticamente desde el servid
 - Editar y eliminar preguntas o sets aún no tiene botones en la interfaz (sí funciona por API).
 - Un alumno que pierde la conexión y vuelve a entrar crea un participante nuevo en vez de recuperar su progreso.
 - El sistema solo es accesible dentro de la misma red local mientras corre con `npm run dev`; no está desplegado en un servidor público.
-
-
-## Equipo
-
-Carlos Pérez García · Christian Jesus Pacheco Robles · Alexis Michael García Hernández · Dennise Hernández Salas
-
-Proyecto Integrador — Universidad Politécnica de Santa Rosa Jáuregui — Carrera ITIID IA
