@@ -40,8 +40,8 @@ export default function ProyeccionSalaPage() {
   const [origen, setOrigen] = useState("");
 
   useEffect(() => {
-    setOrigen(window.location.origin);
-  }, []);
+      setOrigen(process.env.NEXT_PUBLIC_LAN_URL || window.location.origin);
+    }, []);
 
   useEffect(() => {
     function onParticipantes(lista: Participante[]) {

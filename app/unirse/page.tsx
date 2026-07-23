@@ -106,6 +106,16 @@ function UnirseContenido() {
     });
   }
 
+  function handleUnirseOtraSala() {
+    setCodigo("");
+    setAlias("");
+    setParticipanteId(null);
+    setUnido(false);
+    setPregunta(null);
+    setFeedback(null);
+    setRanking(null);
+  }
+
   const letras = ["a", "b", "c", "d"] as const;
 
   if (ranking) {
@@ -128,6 +138,12 @@ function UnirseContenido() {
             <p className="mt-1 text-lg text-ink">{yo.puntaje} puntos</p>
           </div>
         )}
+        <button
+          onClick={handleUnirseOtraSala}
+          className="m-btn m-btn-primary mt-4 px-6 py-3"
+        >
+          Unirse a otra sala
+        </button>
       </div>
     );
   }
