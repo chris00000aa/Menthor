@@ -17,7 +17,6 @@ El docente crea preguntas (a mano o con ayuda de IA), las agrupa en sets, lanza 
 - [Eventos de Socket.IO](#eventos-de-socketio)
 - [Limitaciones conocidas](#limitaciones-conocidas)
 - [Documentación](#documentación)
-- [Equipo](#equipo)
 
 ## Características
 
