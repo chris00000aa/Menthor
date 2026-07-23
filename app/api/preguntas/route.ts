@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
         dificultad: datos.dificultad,
         origen: datos.origen,
         docenteId: sesion.docenteId,
+        tiempoLimiteMs: datos.tiempoLimiteMs,
       },
     });
 

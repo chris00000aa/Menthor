@@ -32,6 +32,7 @@ export const preguntaSchema = z
     respuestaCorrecta: z.string().min(1, "Falta indicar la respuesta correcta"),
     dificultad: z.enum(dificultades).default("media"),
     origen: z.enum(["manual", "ia"]).default("manual"),
+    tiempoLimiteMs: z.number().int().min(5000).max(120000).default(30000),
   })
   .refine((datos) => datos.opciones.includes(datos.respuestaCorrecta), {
     message: "La respuesta correcta debe ser una de las opciones",

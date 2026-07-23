@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import NavHeader from "@/components/NavHeader";
 
 interface SetSimple {
   id: number;
@@ -58,57 +59,63 @@ export default function SalasPage() {
 
   if (cargando) {
     return (
-      <div className="flex flex-1 items-center justify-center">
-        <p className="text-sm text-muted">Cargando...</p>
-      </div>
+      <>
+        <NavHeader />
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-sm text-muted">Cargando...</p>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="flex-1 px-4 py-10 sm:py-14">
-      <div className="mx-auto w-full max-w-3xl space-y-6">
-        <div>
-          <h1 className="text-3xl font-semibold text-ink">Crear sala</h1>
-          <p className="mt-1.5 text-sm text-muted">
-            Elige un set para abrir una sala y proyectarla en clase.
-          </p>
-        </div>
+    <>
+      <NavHeader />
+      <div className="flex-1 px-4 py-10 sm:py-14">
+        <div className="mx-auto w-full max-w-3xl space-y-6">
+          <div>
+            <h1 className="text-3xl font-semibold text-ink">Crear sala</h1>
+            <p className="mt-1.5 text-sm text-muted">
+              Elige un set para abrir una sala y proyectarla en clase.
+            </p>
+          </div>
 
-        {sets.length === 0 ? (
-          <p className="text-sm text-muted">
-            Aún no tienes sets — crea uno primero en la pantalla de sets.
-          </p>
-        ) : (
-          <ul className="space-y-3">
-            {sets.map((s) => (
-              <li
-                key={s.id}
-                className="m-card flex items-center justify-between gap-4 p-5"
-              >
-                <div>
-                  <strong className="text-ink">{s.nombre}</strong>
-                  <p className="mt-0.5 text-sm text-muted">
-                    {s.preguntas.length} pregunta(s)
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleCrearSala(s.id)}
-                  disabled={creandoId === s.id}
-                  className="m-btn m-btn-primary shrink-0 px-4 py-2 text-sm"
+          {sets.length === 0 ? (
+            <p className="text-sm text-muted">
+              Aún no tienes sets — crea uno primero en la pantalla de sets.
+            </p>
+          ) : (
+            <ul className="space-y-3">
+              {sets.map((s) => (
+                <li
+                  key={s.id}
+                  className="m-card flex items-center justify-between gap-4 p-5"
                 >
-                  {creandoId === s.id ? "Creando..." : "Crear sala"}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+                  <div>
+                    <strong className="text-ink">{s.nombre}</strong>
+                    <p className="mt-0.5 text-sm text-muted">
+                      {s.preguntas.length} pregunta(s)
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleCrearSala(s.id)}
+                    disabled={creandoId === s.id}
+                    className="m-btn m-btn-primary shrink-0 px-4 py-2 text-sm"
+                  >
+                    {creandoId === s.id ? "Creando..." : "Crear sala"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
 
-        {error && (
-          <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
-            {error}
-          </p>
-        )}
+          {error && (
+            <p className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
+              {error}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

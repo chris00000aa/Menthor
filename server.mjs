@@ -8,7 +8,6 @@ import { PrismaClient } from "@prisma/client";
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
 const port = 3000;
-const TIEMPO_LIMITE_MS = 20000; // 20 segundos por pregunta, usado para el bono de velocidad
 
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
@@ -27,6 +26,7 @@ app.prepare().then(() => {
     juego.respondieron = new Set();
 
     const preguntaActual = juego.preguntas[juego.indiceActual];
+    const tiempoLimite = preguntaActual.tiempoLimiteMs;
 
     io.to(codigo).emit("juego:pregunta", {
       id: preguntaActual.id,
@@ -35,7 +35,52 @@ app.prepare().then(() => {
       tipo: preguntaActual.tipo,
       enunciado: preguntaActual.enunciado,
       opciones: JSON.parse(preguntaActual.opciones),
+      tiempoLimiteMs: tiempoLimite,
     });
+
+    // Programamos el avance automático; se cancela si el profesor avanza antes.
+    juego.temporizadorId = setTimeout(() => {
+      avanzarPregunta(codigo);
+    }, tiempoLimite);
+  }
+
+  async function finalizarJuego(codigo) {
+    const juego = juegosActivos.get(codigo);
+    if (!juego) return;
+
+    await prisma.sala.update({
+      where: { id: juego.salaId },
+      data: { estado: "finalizada" },
+    });
+
+    const ranking = await prisma.participante.findMany({
+      where: { salaId: juego.salaId },
+      orderBy: { puntaje: "desc" },
+    });
+
+    io.to(codigo).emit("juego:finalizado", { ranking });
+
+    juegosActivos.delete(codigo);
+  }
+
+  // Punto único de avance: lo usan tanto el botón manual como el reloj automático.
+  function avanzarPregunta(codigo) {
+    const juego = juegosActivos.get(codigo);
+    if (!juego) return;
+
+    if (juego.temporizadorId) {
+      clearTimeout(juego.temporizadorId);
+      juego.temporizadorId = null;
+    }
+
+    juego.indiceActual += 1;
+
+    if (juego.indiceActual < juego.preguntas.length) {
+      enviarPreguntaActual(codigo);
+      return;
+    }
+
+    finalizarJuego(codigo);
   }
 
   io.on("connection", (socket) => {
@@ -144,12 +189,13 @@ app.prepare().then(() => {
         preguntas: setPreguntas.map((sp) => sp.pregunta),
         indiceActual: 0,
         respondieron: new Set(),
+        temporizadorId: null,
       });
 
       enviarPreguntaActual(codigoNormalizado);
     });
-    // El profesor avanza a la siguiente pregunta, o termina la partida.
-    socket.on("sala:siguiente", async ({ codigo }) => {
+
+    socket.on("sala:siguiente", ({ codigo }) => {
       const codigoNormalizado = (codigo || "").trim().toUpperCase();
       const juego = juegosActivos.get(codigoNormalizado);
 
@@ -158,28 +204,9 @@ app.prepare().then(() => {
         return;
       }
 
-      juego.indiceActual += 1;
-
-      if (juego.indiceActual < juego.preguntas.length) {
-        enviarPreguntaActual(codigoNormalizado);
-        return;
-      }
-
-      await prisma.sala.update({
-        where: { id: juego.salaId },
-        data: { estado: "finalizada" },
-      });
-
-      const ranking = await prisma.participante.findMany({
-        where: { salaId: juego.salaId },
-        orderBy: { puntaje: "desc" },
-      });
-
-      io.to(codigoNormalizado).emit("juego:finalizado", { ranking });
-
-      juegosActivos.delete(codigoNormalizado);
+      avanzarPregunta(codigoNormalizado);
     });
-    // Un alumno responde la pregunta activa.
+
     socket.on("juego:responder", async ({ preguntaId, respuestaDada, tiempoMs }) => {
       const codigo = socket.data.codigo;
       const participanteId = socket.data.participanteId;
@@ -214,8 +241,9 @@ app.prepare().then(() => {
       let puntos = 0;
 
       if (correcta) {
-        const tiempoRestante = Math.max(0, TIEMPO_LIMITE_MS - tiempoMs);
-        puntos = Math.round(500 + 500 * (tiempoRestante / TIEMPO_LIMITE_MS));
+        const tiempoLimite = preguntaActual.tiempoLimiteMs;
+        const tiempoRestante = Math.max(0, tiempoLimite - tiempoMs);
+        puntos = Math.round(500 + 500 * (tiempoRestante / tiempoLimite));
       }
 
       await prisma.respuesta.create({

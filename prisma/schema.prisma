@@ -32,6 +32,7 @@ model Pregunta {
   respuestaCorrecta String   // índice o valor correcto, según el tipo
   origen            String   @default("manual") // "manual" | "ia"
   dificultad        String   @default("media")  // "facil" | "media" | "dificil"
+  tiempoLimiteMs    Int      @default(30000)
   creadaEn          DateTime @default(now())
 
   docenteId Int
