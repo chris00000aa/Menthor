@@ -150,9 +150,6 @@ El avance de pregunta también puede dispararse automáticamente desde el servid
 - Un alumno que pierde la conexión y vuelve a entrar crea un participante nuevo en vez de recuperar su progreso.
 - El sistema solo es accesible dentro de la misma red local mientras corre con `npm run dev`; no está desplegado en un servidor público.
 
-## Documentación
-
-El documento completo del proyecto, el manual de usuario y el manual técnico están incluidos como parte de los entregables de la materia.
 
 ## Equipo
 
