@@ -1,36 +1,27 @@
-import type { NextConfig } from "next";
+// app/api/red/route.ts
+
+import { NextResponse } from "next/server";
 import os from "node:os";
 
-function detectarIpLocal(): string | null {
+export async function GET() {
   const interfaces = os.networkInterfaces();
 
-  // Primero, busca un adaptador de WiFi real.
   for (const nombre of Object.keys(interfaces)) {
     for (const direccion of interfaces[nombre] || []) {
       if (direccion.family === "IPv4" && !direccion.internal && /wi-?fi|wlan/i.test(nombre)) {
-        return direccion.address;
+        return NextResponse.json({ ip: direccion.address });
       }
     }
   }
 
-  // Si no hay WiFi, cualquier IPv4 real, evitando adaptadores virtuales (VPN, VirtualBox, etc.)
   for (const nombre of Object.keys(interfaces)) {
     if (/virtual|vmware|vbox|hyper-v/i.test(nombre)) continue;
     for (const direccion of interfaces[nombre] || []) {
       if (direccion.family === "IPv4" && !direccion.internal) {
-        return direccion.address;
+        return NextResponse.json({ ip: direccion.address });
       }
     }
   }
 
-  return null;
+  return NextResponse.json({ ip: null });
 }
-
-const ipLocal = detectarIpLocal();
-
-const nextConfig: NextConfig = {
-  allowedDevOrigins: ipLocal ? [ipLocal] : [],
-  devIndicators: false,
-};
-
-export default nextConfig;
